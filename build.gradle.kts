@@ -10,7 +10,12 @@ plugins {
 }
 
 group = "com.example"
-version = "0.0.1"
+version = "0.1.0"
+
+val dockerRegistryRepo = "dmitrymv"
+val dockerImageName = project.name
+val dockerVersionTag = version
+
 application {
     mainClass.set("com.example.ApplicationKt")
 }
@@ -36,4 +41,43 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+}
+
+task<Exec>("buildImage") {
+    group = "docker"
+    description = "Assemble docker image"
+    dependsOn("assembleDist")
+    commandLine(
+        "docker",
+        "build",
+        "-t",
+        "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag",
+        "."
+    )
+}
+
+task<Exec>("pushImage") {
+    group = "docker"
+    description = "Push image to DockerHub"
+    dependsOn("buildImage")
+    commandLine(
+        "docker",
+        "push",
+        "-t",
+        "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag"
+    )
+}
+
+task<Exec>("runImage") {
+    group = "docker"
+    description = "Run Image"
+    dependsOn("buildImage")
+    commandLine(
+        "docker",
+        "run",
+        "-dp",
+        "8080:8080",
+        "--rm",
+        "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag"
+    )
 }
