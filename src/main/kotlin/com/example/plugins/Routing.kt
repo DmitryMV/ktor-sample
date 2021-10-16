@@ -10,7 +10,7 @@ fun Application.configureRouting() {
 
     routing {
         get("/") {
-                call.respondText("Hello World 2!")
+                call.respondText("Hello World!")
             }
     }
 }
