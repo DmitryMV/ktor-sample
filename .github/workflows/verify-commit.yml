@@ -1,17 +1,16 @@
-name: GitHub Actions Demo
+name: Verify commit
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Check-Assemble-BuildImage:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: ./gradlew check assemble
+      - run: ./gradlew check assemble buildImage
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: Check
+          name: Tests Result
           path: build/test-results/test/TEST-*.xml
           reporter: java-junit
-      - run: echo "🍏 This job's status is ${{ job.status }}."
