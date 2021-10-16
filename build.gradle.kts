@@ -63,7 +63,6 @@ task<Exec>("pushImage") {
     commandLine(
         "docker",
         "push",
-        "-t",
         "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag"
     )
 }
