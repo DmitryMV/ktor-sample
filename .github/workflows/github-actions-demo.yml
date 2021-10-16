@@ -11,7 +11,7 @@ jobs:
         uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: JEST Tests
+          name: Check
           path: build/test-results/test/TEST-*.xml
           reporter: java-junit
       - run: echo "🍏 This job's status is ${{ job.status }}."
