@@ -32,3 +32,5 @@ jobs:
             TBD
           draft: false
           prerelease: false
+      - run: git tag -a myRelease -m "Release 1.6.0
+      - run: git push --tags upstream
