@@ -14,11 +14,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: my-docker-hub-namespace/my-docker-hub-repository
       - run: ./gradlew assemble pushImage
       - name: Create Release
         id: create_release
@@ -32,5 +27,5 @@ jobs:
             TBD
           draft: false
           prerelease: false
-      - run: git tag -a myRelease -m "Release 1.6.0
+      - run: git tag -a myRelease -m "Release 1.6.0"
       - run: git push --tags upstream
