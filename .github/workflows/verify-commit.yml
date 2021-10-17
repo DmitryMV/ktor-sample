@@ -6,7 +6,12 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: ./gradlew check assemble buildImage
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          cache: 'gradle'
+      - run: ./gradlew --no-daemon check assemble buildImage
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()
