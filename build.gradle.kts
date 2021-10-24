@@ -15,8 +15,10 @@ group = "com.example"
 version = "0.1.0"
 
 val dockerRegistryRepo = "dmitrymv"
-val dockerImageName = project.name
-val dockerVersionTag = version
+val dockerImageName = "$dockerRegistryRepo/${project.name}"
+val dockerImageTag = version
+val dockerImage = "$dockerImageName:$dockerImageTag"
+val dockerExecutable = "${project.name}-${project.version}/${application.executableDir}/${project.name}"
 
 application {
     mainClass.set("com.example.ApplicationKt")
@@ -116,8 +118,12 @@ task<Exec>("buildImage") {
     commandLine(
         "docker",
         "build",
+        "--build-arg",
+        "DIST_PATH=${(tasks["distTar"] as Tar).archiveFile.get().asFile.relativeTo(project.projectDir)}",
+        "--build-arg",
+        "EXECUTABLE=${dockerExecutable}",
         "-t",
-        "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag",
+        dockerImage,
         "."
     )
 }
@@ -129,7 +135,7 @@ task<Exec>("pushImage") {
     commandLine(
         "docker",
         "push",
-        "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag"
+        dockerImage
     )
 }
 
@@ -143,6 +149,6 @@ task<Exec>("runImage") {
         "-dp",
         "8080:8080",
         "--rm",
-        "$dockerRegistryRepo/$dockerImageName:$dockerVersionTag"
+        dockerImage
     )
 }
