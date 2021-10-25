@@ -11,28 +11,8 @@ plugins {
     jacoco
 }
 
-group = "com.example"
-version = "0.1.0"
-
-val dockerRegistryRepo = "dmitrymv"
-val dockerImageName = "$dockerRegistryRepo/${project.name}"
-val dockerImageTag = version
-val dockerImage = "$dockerImageName:$dockerImageTag"
-val dockerExecutable = "${project.name}-${project.version}/${application.executableDir}/${project.name}"
-
-application {
-    mainClass.set("com.example.ApplicationKt")
-}
-
 repositories {
     mavenCentral()
-}
-
-java {
-    toolchain {
-        vendor.set(JvmVendorSpec.ADOPTOPENJDK)
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
 }
 
 dependencies {
@@ -47,7 +27,28 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
 }
 
+group = "com.example"
+version = "0.1.0"
+
+val dockerRegistryRepo = "dmitrymv"
+val dockerImageName = "$dockerRegistryRepo/${project.name}"
+val dockerImageTag = version
+val dockerImage = "$dockerImageName:$dockerImageTag"
+val dockerExecutable = "${project.name}-${project.version}/${application.executableDir}/${project.name}"
+
 var sonarToken: String? = project.findProperty("sonarToken") as String? ?: System.getenv("SONAR_TOKEN")
+
+application {
+    mainClass.set("com.example.ApplicationKt")
+}
+
+java {
+    toolchain {
+        vendor.set(JvmVendorSpec.ADOPTOPENJDK)
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 
 jacoco {
     toolVersion = "0.8.7"
@@ -57,10 +58,6 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
     }
-}
-
-tasks.sonarqube {
-    enabled = sonarToken != null
 }
 
 sonarqube {
@@ -109,6 +106,10 @@ sonarqube {
             "sonar.scm.revision", System.getenv("GITHUB_PR_SHA")
         )
     }
+}
+
+tasks.sonarqube {
+    enabled = sonarToken != null
 }
 
 task<Exec>("buildImage") {
