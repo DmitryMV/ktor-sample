@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  app:
+    image: dmitrymv/ktor-sample:0.1.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: mongo_pwd
+    ports:
+      - 8080:8080
+    secrets:
+      - mongo_pwd
+  mongo:
+    image: mongo:4.4.10
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/ªmongo_pwd
+    volumes:
+      - db-mongo2:/dat/db
+    secrets:
+      - mongo_pwd
+
+volumes:
+  db-mongo2:
+
+secrets:
+  mongo_pwd:
+    external: true
