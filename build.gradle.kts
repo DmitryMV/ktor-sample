@@ -1,14 +1,23 @@
+import kotlinx.kover.api.CoverageEngine.INTELLIJ
+import kotlinx.kover.api.CoverageEngine.JACOCO
+import kotlinx.kover.api.KoverTaskExtension
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
 val prometeus_version: String by project
+val koin_version: String by project
+val assertj_version: String by project
+val json_unit_version: String by project
+val jackson_version: String by project
 
 plugins {
     application
     kotlin("jvm") version "1.5.31"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.5.31"
     id("org.sonarqube") version "3.3"
-    jacoco
+//    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.4.1"
 }
 
 repositories {
@@ -22,8 +31,19 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:$prometeus_version")
     implementation("io.ktor:ktor-metrics:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
+    // Koin
+    implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("io.insert-koin:koin-ktor:$koin_version")
+    // Misc
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    // Testing
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+    testImplementation("io.insert-koin:koin-test-junit5:$koin_version")
+    testImplementation("org.assertj:assertj-core:$assertj_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:$json_unit_version")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:$jackson_version")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
 }
 
@@ -49,14 +69,16 @@ java {
     }
 }
 
-
-jacoco {
-    toolVersion = "0.8.7"
+kover {
+    coverageEngine.set(JACOCO)
 }
 
-tasks.jacocoTestReport {
-    reports {
-        xml.required.set(true)
+tasks.test {
+    extensions.configure(KoverTaskExtension::class) {
+        excludes = listOf(
+            "com\\.example\\.ApplicationKt.*",
+            "com\\.example\\.plugins\\.MonitoringKt.*"
+        )
     }
 }
 
@@ -70,7 +92,7 @@ sonarqube {
 
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
-            jacoco.reportsDirectory.file("test/jacocoTestReport.xml").get()
+            "${project.reporting.baseDir}/kover/report.xml"
         )
         property(
             "sonar.junit.reportPaths",
