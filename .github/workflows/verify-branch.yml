@@ -1,0 +1,48 @@
+name: Verify branch
+on:
+  push:
+    branches:
+      - 'master'
+      - 'release_*'
+jobs:
+  Check-Assemble-BuildImage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Prepare Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          check-latest: false
+          cache: 'gradle'
+      - name: Cache Gradle Build dir
+        uses: actions/cache@v2
+        with:
+          path: |
+            build
+            .gradle
+          key: build-dir
+          restore-keys: build-dir
+      - name: Build and Verify
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO_URL: ${{ github.event.repository.html_url }}
+          GITHUB_PR_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_PR_KEY: ${{ github.event.pull_request.number }}
+          GITHUB_PR_BASE: ${{ github.event.pull_request.base.ref }}
+          GITHUB_PR_HEAD: ${{ github.event.pull_request.head.ref }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_BRANCH_NAME: ${{github.head_ref}}
+          PR_BUILD: true
+        run: ./gradlew --no-daemon check koverReport sonarqube
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Tests Result
+          path: build/test-results/test/TEST-*.xml
+          reporter: java-junit
