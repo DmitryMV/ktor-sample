@@ -96,7 +96,7 @@ sonarqube {
         )
         property(
             "sonar.coverage.exclusions",
-            "**/com/example/Application.*, **/com/example/plugins/Monitoring.kt"
+            "**/com/example/Application.kt, **/com/example/plugins/Monitoring.kt"
         )
         property(
             "sonar.junit.reportPaths",
