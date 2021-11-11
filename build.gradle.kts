@@ -95,6 +95,10 @@ sonarqube {
             "${project.reporting.baseDir}/kover/report.xml"
         )
         property(
+            "sonar.coverage.exclusions",
+            "**/com/example/Application.*, **/com/example/plugins/Monitoring.kt"
+        )
+        property(
             "sonar.junit.reportPaths",
             (tasks["test"] as Test).reports.junitXml.outputLocation.get()
         )
